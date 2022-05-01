@@ -24,27 +24,18 @@ public class Jogo {
 	private static Boolean jogada = true;
 	private static Boolean computador = false;
 	private static char vencedor = SEM_JOGADA;
+	private static final Scanner scanner = new Scanner(System.in);
 	
-	private static char jogo[][] = {
+	private static final char[][] jogo = {
 							{ SEM_JOGADA, SEM_JOGADA, SEM_JOGADA },
 							{ SEM_JOGADA, SEM_JOGADA, SEM_JOGADA },
 							{ SEM_JOGADA, SEM_JOGADA, SEM_JOGADA } };
 
 	public static void main(String[] args) {
-
-		Scanner scanner = new Scanner(System.in);
-
 		try {
 			limparTela();
-		    if (args.length == 1) {
-		    	if (args[0].equals("computador")) {
-		    		computador = true;
-		    		System.out.println(VERDE + "Jogo contra o Computador");
-		    		System.out.println(VERDE + "Pressione uma tecla para continuar...");
-		    		System.in.read();
-		    	}
-		    }
-			
+			jogoContraComputador(args);
+
 			limparTela();
 			while (mostrarMenu(scanner) != 2) {
 				do {
@@ -59,13 +50,10 @@ public class Jogo {
 				} while ((vencedor = vencedor()) == SEM_JOGADA);
 
 				limparTela();
-				if (vencedor == EMPATE)
-					System.out.println(AMARELO + "######### JOGO EMPATADO #########");
-				else
-					System.out.println(VERDE + "######### JOGO ACABOU. O VENCEDOR É '" + vencedor + "' #########");
-				
+				mostrarVencedor();
 				exibirJogo();
 				resetarJogo();
+
 				System.out.println(VERDE + "Pressione uma tecla para continuar...");
 				System.in.read();
 
@@ -80,12 +68,24 @@ public class Jogo {
 		scanner.close();
 	}
 
+	public static void jogoContraComputador(String[] args) throws IOException {
+		if (args.length == 1) {
+			if (args[0].equals("computador")) {
+				computador = true;
+				System.out.println(VERDE + "Jogo contra o Computador");
+				System.out.println(VERDE + "Pressione uma tecla para continuar...");
+				System.in.read();
+			}
+		}
+	}
+
 	public static int mostrarMenu(Scanner scanner) {
 		System.out.println(AZUL + "######### JOGO DA VELHA #########");
 		System.out.println(VERDE + "1 - JOGAR");
 		System.out.println(VERMELHO + "2 - SAIR");
 		System.out.println(AMARELO + "Escolha uma opção: ");
 		System.out.print(BRANCO);
+		scanner.reset();
 		return scanner.nextInt();
 	}
 
@@ -120,17 +120,21 @@ public class Jogo {
 		Random random = new Random();
 		System.out.println(AMARELO + "Escolha a linha - " + jogada(jogada));
 		System.out.print(BRANCO);
-		if (jogada || !computador)
+		if (jogada || !computador) {
+			scanner.reset();
 			linha = scanner.nextInt();
-		else
+		} else {
 			linha = random.nextInt(1, 4);
+		}
 
 		System.out.println(AMARELO + "Escolha a coluna - " + jogada(jogada));
 		System.out.print(BRANCO);
-		if (jogada || !computador)
+		if (jogada || !computador) {
+			scanner.reset();
 			coluna = scanner.nextInt();
-		else
+		} else {
 			coluna = random.nextInt(1, 4);
+		}
 	}
 
 	public static boolean fazerJogada(char jogada) throws IOException {
@@ -144,7 +148,7 @@ public class Jogo {
 			} else {
 				if (Jogo.jogada) {
 					System.out.print(VERMELHO + "JOGADA INVÁLIDA.");
-					System.in.read();					
+					System.in.read();
 				}
 			}
 			return false;
@@ -156,11 +160,11 @@ public class Jogo {
 	}
 
 	public static char vencedor() {
-		int linha = 0;
-		int coluna = 0;
-		int diagonal1 = 0;
-		int diagonal2 = 0;
-		char resultado = SEM_JOGADA;
+		int linha;
+		int coluna;
+		int diagonal1;
+		int diagonal2;
+		char resultado;
 
 		for (int i = 0; i <= 2; i++) {
 			linha = jogo[i][0] + jogo[i][1] + jogo[i][2];
@@ -208,6 +212,13 @@ public class Jogo {
 			return JOGADOR_2;
 
 		return SEM_JOGADA;
+	}
+
+	public static void mostrarVencedor() {
+		if (vencedor == EMPATE)
+			System.out.println(AMARELO + "######### JOGO EMPATADO #########");
+		else
+			System.out.println(VERDE + "######### JOGO ACABOU. O VENCEDOR É '" + vencedor + "' #########");
 	}
 
 	public static void resetarJogo() {
